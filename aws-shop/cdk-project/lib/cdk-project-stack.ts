@@ -21,6 +21,12 @@ export class CdkProjectStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'productsApi', {
       restApiName: 'Products Service',
       description: 'This service serves products.',
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key', 'X-Amz-Security-Token'],
+        statusCode: 200,
+      },
     });
 
     const products = api.root.addResource('products');
