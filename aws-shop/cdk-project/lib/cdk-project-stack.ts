@@ -8,7 +8,7 @@ export class CdkProjectStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const jarPath = path.join(__dirname, '../../target/aws-shop-0.0.1-SNAPSHOT.jar');
+    const jarPath = path.join(__dirname, '../../target/aws-shop-0.0.1-SNAPSHOT-shaded.jar');
 
     const productLambda = new lambda.Function(this, 'ProductLambda', {
       runtime: lambda.Runtime.JAVA_17,
