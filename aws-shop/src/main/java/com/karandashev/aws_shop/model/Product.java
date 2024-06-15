@@ -13,6 +13,16 @@ public class Product {
         this.price = price;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                '}';
+    }
+
     public String getId() {
         return id;
     }

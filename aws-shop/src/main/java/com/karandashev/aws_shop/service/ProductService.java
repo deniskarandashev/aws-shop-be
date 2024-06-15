@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-@Service
 public class ProductService {
 
     private List<Product> products = Arrays.asList(
