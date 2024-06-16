@@ -5,21 +5,26 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karandashev.aws_shop.config.AppConfig;
 import com.karandashev.aws_shop.model.Product;
 import com.karandashev.aws_shop.service.ProductService;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class GetProductsListHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private static ApplicationContext applicationContext;
+    private final ProductService productService;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    static {
-        applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+    @Autowired
+    public GetProductsListHandler(ProductService productService) {
+        this.productService = productService;
+    }
+
+    public GetProductsListHandler() {
+        this.productService = null; // или любая другая логика, если требуется
     }
 
     @Override
@@ -28,8 +33,10 @@ public class GetProductsListHandler implements RequestHandler<APIGatewayProxyReq
 
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
         try {
-            ProductService productService = applicationContext.getBean(ProductService.class);
             List<Product> products = productService.getAllProducts();
+            if (products == null) {
+                throw new NullPointerException("Product list is null");
+            }
             String responseMessage = objectMapper.writeValueAsString(products);
 
             responseEvent.setStatusCode(200);
@@ -47,4 +54,3 @@ public class GetProductsListHandler implements RequestHandler<APIGatewayProxyReq
         return responseEvent;
     }
 }
-

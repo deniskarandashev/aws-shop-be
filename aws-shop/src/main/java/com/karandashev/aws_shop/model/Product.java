@@ -6,6 +6,10 @@ public class Product {
     private String description;
     private double price;
 
+    public Product() {
+        // Default constructor required by Jackson
+    }
+
     public Product(String id, String title, String description, double price) {
         this.id = id;
         this.title = title;

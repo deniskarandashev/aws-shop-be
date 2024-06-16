@@ -5,21 +5,22 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karandashev.aws_shop.config.AppConfig;
 import com.karandashev.aws_shop.model.Product;
 import com.karandashev.aws_shop.service.ProductService;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
 
+@Component
 public class GetProductByIdHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private static ApplicationContext applicationContext;
+    private final ProductService productService;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    static {
-        applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+    @Autowired
+    public GetProductByIdHandler(ProductService productService) {
+        this.productService = productService;
     }
 
     @Override
@@ -28,33 +29,16 @@ public class GetProductByIdHandler implements RequestHandler<APIGatewayProxyRequ
 
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
         try {
-            ProductService productService = applicationContext.getBean(ProductService.class);
-            Map<String, String> pathParams = request.getPathParameters();
-
-            if (pathParams != null && pathParams.containsKey("productId")) {
-                String productId = pathParams.get("productId");
-                Optional<Product> product = productService.getProductById(productId);
-                String responseMessage = product.map(value -> {
-                    try {
-                        return objectMapper.writeValueAsString(value);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }).orElse(null);
-
-                if (product.isEmpty()) {
-                    responseEvent.setStatusCode(404);
-                    responseEvent.setBody("Product not found: wrong ID " + productId);
-                    context.getLogger().log("Product not found: wrong ID " + productId);
-                } else {
-                    responseEvent.setStatusCode(200);
-                    responseEvent.setBody(responseMessage);
-                }
+            String productId = request.getPathParameters().get("id");
+            Optional<Product> product = productService.getProductById(productId);
+            if (!product.isPresent()) {
+                responseEvent.setStatusCode(404);
+                responseEvent.setBody("Product not found");
             } else {
-                responseEvent.setStatusCode(400);
-                responseEvent.setBody("Product ID not provided");
+                String responseMessage = objectMapper.writeValueAsString(product);
+                responseEvent.setStatusCode(200);
+                responseEvent.setBody(responseMessage);
             }
-
             responseEvent.setHeaders(Map.of(
                     "Access-Control-Allow-Origin", "*",
                     "Access-Control-Allow-Headers", "Content-Type",
@@ -68,4 +52,3 @@ public class GetProductByIdHandler implements RequestHandler<APIGatewayProxyRequ
         return responseEvent;
     }
 }
-
