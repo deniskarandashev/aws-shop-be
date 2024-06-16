@@ -42,8 +42,14 @@ public class GetProductByIdHandler implements RequestHandler<APIGatewayProxyRequ
                     }
                 }).orElse(null);
 
-                responseEvent.setStatusCode(200);
-                responseEvent.setBody(responseMessage);
+                if (product.isEmpty()) {
+                    responseEvent.setStatusCode(404);
+                    responseEvent.setBody("Product not found: wrong ID " + productId);
+                    context.getLogger().log("Product not found: wrong ID " + productId);
+                } else {
+                    responseEvent.setStatusCode(200);
+                    responseEvent.setBody(responseMessage);
+                }
             } else {
                 responseEvent.setStatusCode(400);
                 responseEvent.setBody("Product ID not provided");

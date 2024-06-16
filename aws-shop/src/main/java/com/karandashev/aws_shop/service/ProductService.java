@@ -1,7 +1,6 @@
 package com.karandashev.aws_shop.service;
 
 import com.karandashev.aws_shop.model.Product;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
