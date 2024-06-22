@@ -1,13 +1,21 @@
 package com.karandashev.aws_shop.model;
 
+import jakarta.validation.constraints.NotNull;
+import nonapi.io.github.classgraph.json.Id;
+
+import java.util.UUID;
+
 public class Product {
+    @Id
+    @NotNull
     private String id;
+    @NotNull
     private String title;
     private String description;
-    private double price;
+    private int price;
 
-    public Product(String id, String title, String description, double price) {
-        this.id = id;
+    public Product(String id, String title, String description, int price) {
+        this.id = UUID.fromString(id).toString();
         this.title = title;
         this.description = description;
         this.price = price;
@@ -47,11 +55,11 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 }

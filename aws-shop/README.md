@@ -11,25 +11,25 @@
 
 * #### Main [0/70]
 ##### Task 4.1
-- [ ] Use AWS Console to create two database tables in DynamoDB.
-- [ ] Write a script to fill tables with test examples. Store it in your Github repository. Execute it for your DB to fill data.
+- [x] 1 - Use AWS Console to create two database tables in DynamoDB.
+- [x] 2 - Write a script to fill tables with test examples. Store it in your Github repository. Execute it for your DB to fill data.
 
 ##### Task 4.2
-- [ ] Extend your AWS CDK Stack with data about your database table and pass it to lambda’s environment variables section.
-- [ ] Integrate the getProductsList lambda to return via GET /products request a list of products from the database (joined stocks and products tables).
-- [ ] Implement a Product model on FE side as a joined model of product and stock by productId.
-- [ ] Integrate the getProductsById lambda to return via GET /products/{productId} request a single product from the database.
+- [ ] 3 - Extend your AWS CDK Stack with data about your database table and pass it to lambda’s environment variables section.
+- [ ] 4 - Integrate the getProductsList lambda to return via GET /products request a list of products from the database (joined stocks and products tables).
+- [ ] 5 - Implement a Product model on FE side as a joined model of product and stock by productId.
+- [ ] 6 - Integrate the getProductsById lambda to return via GET /products/{productId} request a single product from the database.
 
 ##### Task 4.3
-- [ ] Create a lambda function called createProduct under the Product Service which will be triggered by the HTTP POST method.
-- [ ] The requested URL should be /products.
-- [ ] Implement its logic so it will be creating a new item in a Products table.
-- [ ] Save the URL (API Gateway URL) to execute the implemented lambda functions for later - you'll need to provide it in the PR (e.g in PR's description) when submitting the task.
+- [ ] 7 - Create a lambda function called createProduct under the Product Service which will be triggered by the HTTP POST method.
+- [ ] 8 - The requested URL should be /products.
+- [ ] 9 - Implement its logic so it will be creating a new item in a Products table.
+- [ ] 10 - Save the URL (API Gateway URL) to execute the implemented lambda functions for later - you'll need to provide it in the PR (e.g in PR's description) when submitting the task.
 
 ##### Task 4.4
-- [ ] Commit all your work to separate branch (e.g. task-4 from the latest master) in BE (backend) and if needed in FE (frontend) repositories.
-- [ ] Create a pull request to the master branch.
-- [ ] Submit link to the pull request to Crosscheck page in RS App.
+- [ ] 11 - Commit all your work to separate branch (e.g. task-4 from the latest master) in BE (backend) and if needed in FE (frontend) repositories.
+- [x] 12 - Create a pull request to the master branch.
+- [x] 13 - Submit link to the pull request to Crosscheck page in RS App.
 
 
 * ### Additional [0/30]
