@@ -16,7 +16,7 @@
 
 ##### Task 4.2
 - [x] 3 - Extend your AWS CDK Stack with data about your database table and pass it to lambda’s environment variables section.
-- [ ] 4 - Integrate the getProductsList lambda to return via GET /products request a list of products from the database (joined stocks and products tables).
+- [x] 4 - Integrate the getProductsList lambda to return via GET /products request a list of products from the database (joined stocks and products tables).
 - [ ] 5 - Implement a Product model on FE side as a joined model of product and stock by productId.
 - [ ] 6 - Integrate the getProductsById lambda to return via GET /products/{productId} request a single product from the database.
 

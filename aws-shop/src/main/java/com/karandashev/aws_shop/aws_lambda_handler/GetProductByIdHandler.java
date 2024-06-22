@@ -5,11 +5,9 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karandashev.aws_shop.config.AppConfig;
 import com.karandashev.aws_shop.model.Product;
 import com.karandashev.aws_shop.service.ProductService;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,9 +16,9 @@ public class GetProductByIdHandler implements RequestHandler<APIGatewayProxyRequ
     private static ApplicationContext applicationContext;
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    static {
-        applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-    }
+//    static {
+//        applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+//    }
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
