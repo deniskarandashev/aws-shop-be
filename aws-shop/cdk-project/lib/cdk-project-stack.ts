@@ -4,8 +4,13 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 
+interface CdkProjectStackProps extends cdk.StackProps {
+  productsTableArn: string; // ARN of the products DynamoDB table
+  stocksTableArn: string; // ARN of the stocks DynamoDB table
+}
+
 export class CdkProjectStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: CdkProjectStackProps) {
     super(scope, id, props);
 
     const jarPath = path.join(__dirname, '../../target/aws-shop-0.0.1-SNAPSHOT-shaded.jar');
@@ -14,14 +19,10 @@ export class CdkProjectStack extends cdk.Stack {
       runtime: lambda.Runtime.JAVA_17,
       code: lambda.Code.fromAsset(jarPath),
       handler: 'com.karandashev.aws_shop.aws_lambda_handler.GetProductsListHandler::handleRequest',
-      memorySize: 1024,
-      timeout: cdk.Duration.seconds(30),
-    });
-
-    const getProductByIdLambda = new lambda.Function(this, 'GetProductByIdLambda', {
-      runtime: lambda.Runtime.JAVA_17,
-      code: lambda.Code.fromAsset(jarPath),
-      handler: 'com.karandashev.aws_shop.aws_lambda_handler.GetProductByIdHandler::handleRequest',
+      environment: {
+        PRODUCTS_TABLE_ARN: props.productsTableArn, // Environment variable for products table ARN
+        STOCKS_TABLE_ARN: props.stocksTableArn, // Environment variable for stocks table ARN
+      },
       memorySize: 1024,
       timeout: cdk.Duration.seconds(30),
     });

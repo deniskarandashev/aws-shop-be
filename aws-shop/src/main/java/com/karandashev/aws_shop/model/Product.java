@@ -14,8 +14,8 @@ public class Product {
     private String description;
     private int price;
 
-    public Product(String id, String title, String description, int price) {
-        this.id = UUID.fromString(id).toString();
+    public Product(String title, String description, int price) {
+        this.id = UUID.randomUUID().toString();
         this.title = title;
         this.description = description;
         this.price = price;
