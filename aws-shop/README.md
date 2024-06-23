@@ -16,7 +16,7 @@
     "count": 200
     }`
 
-### Estimation (self-estimation: 85/100)
+### Estimation (self-estimation: 100/100)
 
 * #### Main [70/70]
 ##### Task 4.1
@@ -41,11 +41,11 @@
 - [x] 13 - Submit link to the pull request to Crosscheck page in RS App.
 
 
-* ### Additional [15/30]
+* ### Additional [30/30]
 - [x] +7.5 (All languages) - PUT /products lambda functions returns error 400 status code if product data is invalid
 - [x]  +7.5 (All languages) - All lambdas return error 500 status code on any error (DB connection, any unhandled error in code)
-- [ ]  +7.5 (All languages) - All lambdas do console.log for each incoming requests and their arguments
-- [ ]  +7.5 (All languages) - Transaction based creation of product (in case stock creation is failed then related to this stock product is not created and not ready to be used by the end user and vice versa)
+- [x]  +7.5 (All languages) - All lambdas do console.log for each incoming requests and their arguments
+- [x]  +7.5 (All languages) - Transaction based creation of product (in case stock creation is failed then related to this stock product is not created and not ready to be used by the end user and vice versa)
 
 ## [Task 3] Add backend using AWS Lambdas and API Gateway - ARCHIVED STEP
 

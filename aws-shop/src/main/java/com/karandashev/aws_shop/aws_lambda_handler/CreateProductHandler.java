@@ -9,9 +9,7 @@ import com.karandashev.aws_shop.model.ProductDto;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +22,8 @@ public class CreateProductHandler implements RequestHandler<APIGatewayProxyReque
             .region(Region.EU_NORTH_1)
             .build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final String PRODUCTS_TABLE_NAME = System.getenv("PRODUCTS_TABLE_NAME");
+    private static final String PRODUCTS_TABLE_NAME = "products";
+    private static final String STOCK_TABLE_NAME = "stocks";
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
@@ -36,25 +35,47 @@ public class CreateProductHandler implements RequestHandler<APIGatewayProxyReque
             ProductDto product = objectMapper.readValue(request.getBody(), ProductDto.class);
 
             // Validate input
-            if (product == null || product.getTitle() == null || product.getDescription() == null || product.getPrice() <= 0) {
+            if (product == null || product.getTitle() == null || product.getDescription() == null || product.getPrice() <= 0 || product.getCount() <= 0) {
                 responseEvent.setStatusCode(400);
-                responseEvent.setBody("Invalid input: Product title, description, and price are required.");
+                responseEvent.setBody("Invalid input: Product title, description, price, and count are required.");
                 return responseEvent;
             }
 
-            // Prepare DynamoDB item
+            // Prepare DynamoDB item for product
             String productId = UUID.randomUUID().toString();
-            Map<String, AttributeValue> itemValues = new HashMap<>();
-            itemValues.put("id", AttributeValue.builder().s(productId).build());
-            itemValues.put("title", AttributeValue.builder().s(product.getTitle()).build());
-            itemValues.put("description", AttributeValue.builder().s(product.getDescription()).build());
-            itemValues.put("price", AttributeValue.builder().n(String.valueOf(product.getPrice())).build());
-            itemValues.put("count", AttributeValue.builder().n(String.valueOf(product.getCount())).build());
+            Map<String, AttributeValue> productItem = new HashMap<>();
+            productItem.put("id", AttributeValue.builder().s(productId).build());
+            productItem.put("title", AttributeValue.builder().s(product.getTitle()).build());
+            productItem.put("description", AttributeValue.builder().s(product.getDescription()).build());
+            productItem.put("price", AttributeValue.builder().n(String.valueOf(product.getPrice())).build());
 
-            // Insert item into DynamoDB
-            dynamoDbClient.putItem(PutItemRequest.builder()
-                    .tableName(PRODUCTS_TABLE_NAME)
-                    .item(itemValues)
+            // Prepare DynamoDB item for stock
+            Map<String, AttributeValue> stockItem = new HashMap<>();
+            stockItem.put("product_id", AttributeValue.builder().s(productId).build());
+            stockItem.put("count", AttributeValue.builder().n(String.valueOf(product.getCount())).build());
+
+            // Log items
+            context.getLogger().log("Product item: " + productItem.toString());
+            context.getLogger().log("Stock item: " + stockItem.toString());
+
+            // Create transact write items
+            TransactWriteItem putProduct = TransactWriteItem.builder()
+                    .put(Put.builder()
+                            .tableName(PRODUCTS_TABLE_NAME)
+                            .item(productItem)
+                            .build())
+                    .build();
+
+            TransactWriteItem putStock = TransactWriteItem.builder()
+                    .put(Put.builder()
+                            .tableName(STOCK_TABLE_NAME)
+                            .item(stockItem)
+                            .build())
+                    .build();
+
+            // Execute transaction
+            dynamoDbClient.transactWriteItems(TransactWriteItemsRequest.builder()
+                    .transactItems(putProduct, putStock)
                     .build());
 
             // Successful response
@@ -71,12 +92,19 @@ public class CreateProductHandler implements RequestHandler<APIGatewayProxyReque
             // JSON parsing or deserialization error
             responseEvent.setStatusCode(400);
             responseEvent.setBody("Invalid JSON format: " + e.getMessage());
+        } catch (TransactionCanceledException e) {
+            // Log transaction cancellation reasons
+            context.getLogger().log("Transaction cancelled: " + e.cancellationReasons());
+            responseEvent.setStatusCode(500);
+            responseEvent.setBody("Transaction cancelled: " + e.getMessage());
         } catch (DynamoDbException e) {
             // DynamoDB operation error
+            context.getLogger().log("DynamoDB Error: " + e.awsErrorDetails().errorMessage());
             responseEvent.setStatusCode(500);
             responseEvent.setBody("DynamoDB Error: " + e.getMessage());
         } catch (Exception e) {
             // Other unexpected errors
+            context.getLogger().log("Internal Server Error: " + e.getMessage());
             responseEvent.setStatusCode(500);
             responseEvent.setBody("Internal Server Error: " + e.getMessage());
         }
