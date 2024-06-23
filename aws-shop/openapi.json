@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://sfn070sct9.execute-api.eu-north-1.amazonaws.com/prod/",
+      "url": "https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/",
       "description": "Generated server url"
     }
   ],

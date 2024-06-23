@@ -5,7 +5,9 @@
 ### Links
 
 * Task: https://github.com/rolling-scopes-school/aws/blob/main/aws-developer/04_integration_with_nosql_database/task.md
-* cloudfront: https://d3czter152p0zl.cloudfront.net
+* cloudfront: d3czter152p0zl.cloudfront.net
+* GET /products https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products
+* GET /products/{productId} https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products/1e3af1b2-e799-4b18-9102-ecfd0c3e4b62
 
 ### Estimation (self-estimation: 0/100)
 
@@ -17,8 +19,8 @@
 ##### Task 4.2
 - [x] 3 - Extend your AWS CDK Stack with data about your database table and pass it to lambda’s environment variables section.
 - [x] 4 - Integrate the getProductsList lambda to return via GET /products request a list of products from the database (joined stocks and products tables).
-- [ ] 5 - Implement a Product model on FE side as a joined model of product and stock by productId.
-- [ ] 6 - Integrate the getProductsById lambda to return via GET /products/{productId} request a single product from the database.
+- [x] 5 - Implement a Product model on FE side as a joined model of product and stock by productId.
+- [x] 6 - Integrate the getProductsById lambda to return via GET /products/{productId} request a single product from the database.
 
 ##### Task 4.3
 - [ ] 7 - Create a lambda function called createProduct under the Product Service which will be triggered by the HTTP POST method.
