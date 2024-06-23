@@ -5,13 +5,20 @@
 ### Links
 
 * Task: https://github.com/rolling-scopes-school/aws/blob/main/aws-developer/04_integration_with_nosql_database/task.md
-* cloudfront: d3czter152p0zl.cloudfront.net
-* GET /products https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products
-* GET /products/{productId} https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products/1e3af1b2-e799-4b18-9102-ecfd0c3e4b62
+* cloudfront: https://d3czter152p0zl.cloudfront.net
+* APIs:
+  * GET /products https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products
+  * GET /products/{productId} https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/products/1e3af1b2-e799-4b18-9102-ecfd0c3e4b62
+  * PUT /product https://48drocfq1a.execute-api.eu-north-1.amazonaws.com/prod/product
+    * `{ "price": 10,
+    "title": "Small thing",
+    "description": "You don't need it actually",
+    "count": 200
+    }`
 
-### Estimation (self-estimation: 0/100)
+### Estimation (self-estimation: 85/100)
 
-* #### Main [0/70]
+* #### Main [70/70]
 ##### Task 4.1
 - [x] 1 - Use AWS Console to create two database tables in DynamoDB.
 - [x] 2 - Write a script to fill tables with test examples. Store it in your Github repository. Execute it for your DB to fill data.
@@ -29,14 +36,14 @@
 - [x] 10 - Save the URL (API Gateway URL) to execute the implemented lambda functions for later - you'll need to provide it in the PR (e.g in PR's description) when submitting the task.
 
 ##### Task 4.4
-- [ ] 11 - Commit all your work to separate branch (e.g. task-4 from the latest master) in BE (backend) and if needed in FE (frontend) repositories.
+- [x] 11 - Commit all your work to separate branch (e.g. task-4 from the latest master) in BE (backend) and if needed in FE (frontend) repositories.
 - [x] 12 - Create a pull request to the master branch.
 - [x] 13 - Submit link to the pull request to Crosscheck page in RS App.
 
 
-* ### Additional [0/30]
-- [ ] +7.5 (All languages) - POST /products lambda functions returns error 400 status code if product data is invalid
-- [ ]  +7.5 (All languages) - All lambdas return error 500 status code on any error (DB connection, any unhandled error in code)
+* ### Additional [15/30]
+- [x] +7.5 (All languages) - PUT /products lambda functions returns error 400 status code if product data is invalid
+- [x]  +7.5 (All languages) - All lambdas return error 500 status code on any error (DB connection, any unhandled error in code)
 - [ ]  +7.5 (All languages) - All lambdas do console.log for each incoming requests and their arguments
 - [ ]  +7.5 (All languages) - Transaction based creation of product (in case stock creation is failed then related to this stock product is not created and not ready to be used by the end user and vice versa)
 
