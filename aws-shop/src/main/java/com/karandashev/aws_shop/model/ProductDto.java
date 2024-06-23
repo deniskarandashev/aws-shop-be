@@ -7,6 +7,8 @@ public class ProductDto {
     private int price;
     private int сount;
 
+    public ProductDto() {}
+
     public ProductDto(String id, String title, String description, int price, int сount) {
         this.id = id;
         this.title = title;

@@ -1,18 +1,17 @@
 package com.karandashev.aws_shop.model;
 
 import jakarta.validation.constraints.NotNull;
-import nonapi.io.github.classgraph.json.Id;
 
 import java.util.UUID;
 
 public class Product {
-    @Id
-    @NotNull
     private String id;
     @NotNull
     private String title;
     private String description;
     private int price;
+
+    public Product() {}
 
     public Product(String title, String description, int price) {
         this.id = UUID.randomUUID().toString();

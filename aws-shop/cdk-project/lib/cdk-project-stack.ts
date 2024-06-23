@@ -40,6 +40,18 @@ export class CdkProjectStack extends cdk.Stack {
       timeout: cdk.Duration.seconds(30),
     });
 
+    const createProductLambda = new lambda.Function(this, 'CreateProductLambda', {
+      runtime: lambda.Runtime.JAVA_17,
+      code: lambda.Code.fromAsset(jarPath),
+      handler: 'com.karandashev.aws_shop.aws_lambda_handler.CreateProductHandler::handleRequest',
+      environment: {
+        PRODUCTS_TABLE_NAME: props.productsTableArn.split('/').pop()!,
+        STOCKS_TABLE_NAME: props.stocksTableArn.split('/').pop()!,
+      },
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(30),
+    });
+
     const api = new apigateway.RestApi(this, 'productsApi', {
       restApiName: 'Products Service',
       description: 'This service serves products.',
@@ -49,6 +61,7 @@ export class CdkProjectStack extends cdk.Stack {
 
     this.apiGatewayProducts(api, getProductsListLambda, products);
     this.apiGatewayProductById(api, getProductByIdLambda, products);
+    this.apiGatewayCreateProduct(api, createProductLambda);
 
   }
 
@@ -113,6 +126,52 @@ export class CdkProjectStack extends cdk.Stack {
     });
 
     products.addMethod('OPTIONS', new apigateway.MockIntegration({
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Credentials': "'false'",
+            'method.response.header.Access-Control-Allow-Methods': "'OPTIONS,GET,PUT,POST,DELETE'",
+          },
+        },
+      ],
+      passthroughBehavior: apigateway.PassthroughBehavior.NEVER,
+      requestTemplates: {
+        'application/json': '{"statusCode": 200}',
+      },
+    }), {
+      methodResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': true,
+            'method.response.header.Access-Control-Allow-Origin': true,
+            'method.response.header.Access-Control-Allow-Credentials': true,
+            'method.response.header.Access-Control-Allow-Methods': true,
+          },
+        },
+      ],
+    });
+  }
+
+  private apiGatewayCreateProduct(api: RestApi, createProductLambda: any) {
+    const product = api.root.addResource('product');
+    const createProductIntegration = new apigateway.LambdaIntegration(createProductLambda);
+    product.addMethod('PUT', createProductIntegration, {
+      authorizationType: apigateway.AuthorizationType.NONE,
+      methodResponses: [
+        {
+          statusCode: '201',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Origin': true,
+          },
+        },
+      ],
+    });
+
+    product.addMethod('OPTIONS', new apigateway.MockIntegration({
       integrationResponses: [
         {
           statusCode: '200',
