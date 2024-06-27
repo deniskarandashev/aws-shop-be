@@ -4,8 +4,8 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
@@ -18,12 +18,17 @@ import java.util.Map;
 
 public class ImportProductsFileHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
+    private final S3Client s3Client;
     private static final S3Presigner s3Presigner = S3Presigner.builder()
-            .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
             .region(Region.EU_NORTH_1)
             .build();
 
     private static final String BUCKET_NAME = "import-service-aws-shop";
+
+    // For tests
+    public ImportProductsFileHandler(S3Client s3Client) {
+        this.s3Client = s3Client;
+    }
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
@@ -51,7 +56,7 @@ public class ImportProductsFileHandler implements RequestHandler<APIGatewayProxy
         return responseEvent;
     }
 
-    private String generateSignedUrl(String fileName) {
+    public String generateSignedUrl(String fileName) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(BUCKET_NAME)
@@ -81,4 +86,3 @@ public class ImportProductsFileHandler implements RequestHandler<APIGatewayProxy
         return headers;
     }
 }
-
