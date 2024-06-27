@@ -3,24 +3,26 @@ import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import path from 'path';
+import * as s3Notifications from 'aws-cdk-lib/aws-s3-notifications';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as path from 'path';
 
 export class CdkProjectStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Find an existing S3 bucket if it already exists
-    const existingBucket = s3.Bucket.fromBucketName(this, 'ImportServiceBucket', 'import-service-aws-shop');
+    // Create or import S3 bucket
+    const bucket = s3.Bucket.fromBucketName(this, 'ImportServiceBucket', 'import-service-aws-shop') ||
+        new s3.Bucket(this, 'ImportServiceBucket', {
+          bucketName: 'import-service-aws-shop',
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+          autoDeleteObjects: true
+        });
 
-    // If the bucket does not exist, create a new one
-    const bucket = existingBucket || new s3.Bucket(this, 'ImportServiceBucket', {
-      bucketName: 'import-service-aws-shop',
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true
-    });
-
+    // Define the path to the JAR file for the importProductsFileLambda function
     const jarPath = path.join(__dirname, '../../target/import-service-0.0.1-SNAPSHOT-shaded.jar');
 
+    // Define the importProductsFile Lambda function
     const importProductsFileLambda = new lambda.Function(this, 'ImportProductsFileHandler', {
       runtime: lambda.Runtime.JAVA_17,
       handler: 'com.karandashev.aws_shop.aws_lambda_handler.ImportProductsFileHandler::handleRequest',
@@ -30,9 +32,41 @@ export class CdkProjectStack extends cdk.Stack {
       },
     });
 
-    bucket.grantPut(importProductsFileLambda);
-    bucket.grantRead(importProductsFileLambda);
+    bucket.grantReadWrite(importProductsFileLambda);
 
+    // Define the importFileParser Lambda function
+    const importFileParserLambda = new lambda.Function(this, 'ImportFileParserHandler', {
+      runtime: lambda.Runtime.JAVA_17,
+      handler: 'com.karandashev.aws_shop.aws_lambda_handler.ImportFileParserHandler::handleRequest',
+      code: lambda.Code.fromAsset(jarPath),
+      environment: {
+        BUCKET_NAME: bucket.bucketName,
+      },
+    });
+
+    bucket.grantReadWrite(importFileParserLambda);
+
+    // Create a role for the importFileParser Lambda function
+    const lambdaExecutionRole = new iam.Role(this, 'ImportFileParserLambdaExecutionRole', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+    });
+
+    lambdaExecutionRole.addToPolicy(new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [`${bucket.bucketArn}/uploaded/*`],
+    }));
+
+    importFileParserLambda.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['logs:*'],
+      resources: ['*'],
+    }));
+
+    // Configure S3 event notification to trigger importFileParserLambda
+    bucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3Notifications.LambdaDestination(importFileParserLambda), {
+      prefix: 'uploaded/',
+    });
+
+    // Define the API Gateway and link it with importProductsFile Lambda function
     const api = new apigateway.RestApi(this, 'ImportProductsFileApi', {
       restApiName: 'Import Products API',
       defaultCorsPreflightOptions: {
